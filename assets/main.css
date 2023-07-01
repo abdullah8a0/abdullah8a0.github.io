@@ -1,0 +1,37 @@
+
+
+/* setup basic variables*/ 
+:root {
+  --bg-color: #ecf0f1;
+  --text-color: #7f8c8d;
+  --link-color: #1abc9c;
+  --link-color-hover: #16a085;
+  --transition-speed: 600ms;
+}
+
+p {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.7em;
+  color: #7f8c8d;
+  margin: 0px 50px 0px 50px;
+}
+
+a {
+  text-decoration: none;
+  color: #1abc9c;
+}
+
+.text-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr)
+}
+
+.nolink {
+    grid-column-start: 1;
+    grid-column-end: 5;
+}
+         
+    
+

@@ -5,16 +5,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
+    <link rel="stylesheet" href="/assets/main.css" />
 </head>
 
 <body>
     <div class="text"> </div>
 </body>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
-    $(function () {
-        $("div.text").load("text.html");
+    // fetch text.html and insert it into the DOM
+    async function fetchText() {
+        const response = await fetch("text.html");
+        const text = await response.text();
+        document.querySelector("div.text").innerHTML = text;
+    }
+
+    // collects adjacent p nodes and wraps them in a div
+
+    fetchText().then(() => {
+        const p = document.querySelectorAll("p");
+        const div = document.createElement("div");
+        div.classList.add("text-grid");
+        p.forEach((p) => {
+            if (!p.querySelector("a")) {
+                p.classList.add("nolink")
+            }
+            div.appendChild(p)
+        });
+        document.querySelector("h2#introduction").appendChild(div);
     });
+
 </script>
 
 </html>
