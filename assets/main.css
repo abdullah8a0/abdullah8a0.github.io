@@ -1,17 +1,7 @@
-/* setup basic variables
-#EBE7FB
-#4C2BDB
-#FCCE2B
-#C19C15
-#372D0A
-*/
 :root {
-  --primary-color: #4C2BDB;
-  --secondary-color: #ffe588;
-  --tertiary-color: #C19C15;
-  --light-color: #e3dcfe;
-  --text-color: #372D0A;
-  --bg-color: var(--light-color);
+  --background-color: hsl(270, 7%, 13%);
+  --foreground-color: hsl(30, 10%, 85%);
+  --my-orange: #C19C15;
   --transition-speed: 600ms;
   --font-stack: 'Open Sans', sans-serif;
 }
@@ -24,8 +14,13 @@ p.text {
   font-size: 1em;
   font-weight: 400;
   line-height: 1.7em;
-  color: var(--text-color);
+  color: var(--foreground-color);
   display: block;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
 }
 
 h2.intro {
@@ -33,17 +28,17 @@ h2.intro {
   margin: 0 auto;
   max-width: 800px;
   padding: 1em 0;
-  color: var(--text-color);
+  color: var(--foreground-color);
 }
 
 .underline {
   text-decoration: underline;
-  text-decoration-color: var(--tertiary-color);
+  text-decoration-color: var(--my-orange);
   transition: border-bottom 0.1s ease-in-out;
 }
 
 .underline:hover {
-  border-bottom: 1px solid var(--tertiary-color);
+  border-bottom: 1px solid var(--my-orange);
 }
 
 .rocket {
@@ -51,6 +46,7 @@ h2.intro {
   transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
 }
+
 div.nav-item:hover .rocket {
   transform: translate(100%, -100%);
 }
@@ -65,21 +61,27 @@ div.nav-item:hover .rocket {
   0% {
     transform: translateX(0);
   }
+
   10% {
     transform: translateY(-2px);
   }
+
   25% {
     transform: translateX(-2px);
   }
+
   35% {
     transform: translateY(2px);
   }
+
   50% {
     transform: translateX(2px);
   }
+
   75% {
     transform: translateX(-2px);
   }
+
   100% {
     transform: translateX(0);
   }
@@ -93,12 +95,15 @@ div.nav-item:hover .book {
   0% {
     transform: rotate(0deg);
   }
+
   10% {
     transform: rotate(10deg);
   }
+
   25% {
     transform: rotate(-10deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -116,9 +121,8 @@ div.nav-item:hover .resume {
 }
 
 
-
 a {
-  color: var(--text-color);
+  color: var(--foreground-color);
   text-decoration: none;
 }
 
@@ -128,7 +132,7 @@ a {
   grid-template-columns: 1fr 1fr;
   justify-items: start;
   padding: 1em 0;
-  border-top: 1px solid var(--text-color);
+  border-top: 1px solid var(--my-orange);
 }
 
 .nav {
@@ -136,7 +140,7 @@ a {
   grid-template-columns: repeat(3, 1fr);
   justify-items: center;
   padding: 0 0 1em 0;
-  border-bottom: 1px solid var(--text-color);
+  border-bottom: 1px solid var(--my-orange);
 }
 
 body {
@@ -144,11 +148,11 @@ body {
   height: 100vh;
   margin: 0 auto;
   padding: 0 1em;
-  background-color: var(--secondary-color);
+  background-color: var(--background-color);
 }
 
 html {
-  background-color: var(--secondary-color);
+  background-color: var(--background-color);
 }
 
 @media (min-width: 768px) {
