@@ -34,11 +34,12 @@ h2.intro {
 .underline {
   text-decoration: underline;
   text-decoration-color: var(--my-orange);
-  transition: border-bottom 0.1s ease-in-out;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.1s ease-in-out;
 }
 
 .underline:hover {
-  border-bottom: 1px solid var(--my-orange);
+    border-color: var(--my-orange);
 }
 
 .rocket {
