@@ -10,7 +10,7 @@
   font-family: var(--font-stack);
 }
 
-p.text {
+.text {
   font-size: 1em;
   font-weight: 400;
   line-height: 1.7em;
@@ -23,12 +23,59 @@ p.text {
   align-items: center;
 }
 
-h2.intro {
+h2 {
   text-align: center;
   margin: 0 auto;
   max-width: 800px;
-  padding: 1em 0;
+  padding: 1em 0 0 0;
   color: var(--foreground-color);
+}
+
+.sem-title {
+  font-size: 1.5em;
+  font-weight: 400;
+  line-height: 1.7em;
+  color: var(--foreground-color);
+  margin: 0.5em 0; 
+  display: block;
+}
+
+.project-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.project-item {
+  display: grid;
+  grid-template-rows: 2fr 1fr; 
+  grid-gap: 1em;
+  padding: 1em 0;
+  border-bottom: 1px solid var(--my-orange);
+}
+
+.project-item-img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.project-title {
+  font-size: 2em;
+  font-weight: 400;
+  line-height: 1.7em;
+  color: var(--foreground-color);
+  display: block;
+}
+.project-item-title {
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.7em;
+  color: var(--foreground-color);
+  display: block;
+}
+
+.project-item-text {
+  display: none;
 }
 
 .underline {
@@ -39,7 +86,7 @@ h2.intro {
 }
 
 .underline:hover {
-    border-color: var(--my-orange);
+  border-color: var(--my-orange);
 }
 
 .rocket {
@@ -133,7 +180,6 @@ a {
   grid-template-columns: 1fr 1fr;
   justify-items: start;
   padding: 1em 0;
-  border-top: 1px solid var(--my-orange);
 }
 
 .nav {
@@ -141,6 +187,11 @@ a {
   grid-template-columns: repeat(3, 1fr);
   justify-items: center;
   padding: 0 0 1em 0;
+  margin: 1em 1em 0 1em;
+}
+
+.bar {
+  width: 100%;
   border-bottom: 1px solid var(--my-orange);
 }
 
@@ -154,10 +205,23 @@ body {
 
 html {
   background-color: var(--background-color);
+  scroll-behavior: smooth;
 }
 
 @media (min-width: 768px) {
   .text-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+  .project-item-text {
+    display: block;
+  }
+  .project-grid{
+    display: grid;
+    grid-template-columns: 1fr; 
+  }
+
+  .project-item {
+    grid-template-columns: 1fr 1fr 3fr;
+    grid-template-rows: 1fr;
   }
 }
