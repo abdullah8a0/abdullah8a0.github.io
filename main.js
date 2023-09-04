@@ -11,15 +11,11 @@ images = [
 
 function shuffle(array) {
   let currentIndex = array.length, randomIndex;
-
-  // While there remain elements to shuffle.
   while (currentIndex > 0) {
 
-    // Pick a remaining element.
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
 
-    // And swap it with the current element.
     [array[currentIndex], array[randomIndex]] = [
       array[randomIndex], array[currentIndex]];
   }
@@ -43,6 +39,8 @@ let infinite = function() {
 }
 infinite();
 
+
+// helper functions
 var clamp = function(x, min, max) {
   return Math.min(Math.max(x, min), max);
 }
@@ -73,6 +71,14 @@ var init_x = rocket_el.getBoundingClientRect().left + rocket_el.getBoundingClien
 var init_y = rocket_el.getBoundingClientRect().top + rocket_el.getBoundingClientRect().height / 2;
 init_x += window.scrollX;
 init_y += window.scrollY;
+
+// update on window resize
+window.addEventListener("resize", function() {
+  init_x = rocket_el.getBoundingClientRect().left + rocket_el.getBoundingClientRect().width / 2;
+  init_y = rocket_el.getBoundingClientRect().top + rocket_el.getBoundingClientRect().height / 2;
+  init_x += window.scrollX;
+  init_y += window.scrollY;
+});
 
 var rocket = {
   x: init_x,
@@ -139,7 +145,7 @@ var updateRocket = function() {
   rocket_el.style.right = (init_x - rocket.x) + "px";
   rocket_el.style.bottom = (init_y - rocket.y) + "px";
   rocket_el.style.transform = "rotate(" + rocket.theta + "rad)";
-  rocket_el.style.transition = "transform 0.3s";
+  rocket_el.style.transition = "transform 0.2s";
   setTimeout(updateRocket, 10);
 }
 
