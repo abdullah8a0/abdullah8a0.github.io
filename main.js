@@ -37,7 +37,9 @@ let infinite = function() {
   index++;
   setTimeout(infinite, 2000);
 }
-infinite();
+if (image_el) {
+  infinite();
+}
 
 
 // helper functions

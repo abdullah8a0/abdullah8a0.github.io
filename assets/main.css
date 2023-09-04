@@ -2,6 +2,7 @@
   --background-color: hsl(270, 7%, 13%);
   --foreground-color: hsl(30, 10%, 85%);
   --my-orange: #C19C15;
+  --my-light-orange: #e6c85c;
   --transition-speed: 600ms;
   --font-stack: 'Open Sans', sans-serif;
 }
@@ -63,15 +64,15 @@
 
 .project-item {
   display: grid;
-  grid-template-rows: 2fr 1fr; 
+  grid-template-rows: 3fr 1fr; 
   grid-gap: 1em;
   padding: 1em 0;
   border-bottom: 1px solid var(--my-orange);
 }
 
 .project-item-img {
-  width: 100%;
-  height: 100%;
+  width: 95%;
+  height: width;
   border-radius: 5px;
 }
 
@@ -84,10 +85,12 @@
 }
 .project-item-title {
   font-size: 1em;
-  font-weight: 400;
+  font-weight: 1000;
   line-height: 1.7em;
   color: var(--foreground-color);
   display: block;
+  justify-self: center;
+  align-self: center;
 }
 
 .project-item-text {
@@ -230,15 +233,29 @@ html {
   }
   .project-item-text {
     display: block;
+    align-self: center;
   }
   .project-grid{
     display: grid;
     grid-template-columns: 1fr; 
   }
 
+  /* add background color when hovering */
   .project-item {
     grid-template-columns: 1fr 1fr 3fr;
     grid-template-rows: 1fr;
+  }
+
+  .project-item:hover {
+    background: linear-gradient(to left, var(--my-orange) 50%, var(--background-color) 50%);
+    background-size: 200% 100%;
+    background-position: right bottom;
+    transition: all 0.3s ease-out;
+  }
+
+  .project-item:hover .project-item-text , .project-item:hover .project-item-title {
+    color: var(--background-color);
+    transition: all 0.3s ease-out;
   }
 
   .head {
