@@ -20,17 +20,17 @@
 
 .head {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 2fr 1fr;
+  grid-template-columns: 1fr;
   justify-items: center;
   align-items: center;
-  margin: 4em 0;
+  margin: 1em 0;
 }
 
 .head-img {
   width: 20rem;
   height: 20rem;
   border-radius: 50%;
-
 }
 
 .nav-item {
@@ -43,7 +43,7 @@
   text-align: center;
   margin: 0 auto;
   max-width: 800px;
-  padding: 1em 0 0 0;
+  padding: 0 0 0 0;
   color: var(--foreground-color);
 }
 
@@ -239,5 +239,15 @@ html {
   .project-item {
     grid-template-columns: 1fr 1fr 3fr;
     grid-template-rows: 1fr;
+  }
+
+  .head {
+    grid-template-rows: 1fr ;
+    grid-template-columns: 1fr 1fr;
+    margin: 4em 0;
+    grid-gap: 1em;
+  }
+  .intro {
+    padding: 1em 0 0 0;
   }
 }
