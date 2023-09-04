@@ -18,12 +18,28 @@
   display: block;
 }
 
+.head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  margin: 4em 0;
+}
+
+.head-img {
+  width: min(100%, 20rem);
+  height: auto;
+  border-radius: 50%;
+
+}
+
 .nav-item {
   display: flex;
   align-items: center;
 }
 
-h2 {
+.intro {
+  font-size: 3em;
   text-align: center;
   margin: 0 auto;
   max-width: 800px;
