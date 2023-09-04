@@ -26,26 +26,22 @@ function shuffle(array) {
   return array;
 }
 
+var index = 0;
+var NUM_IMAGES = images.length;
 
-updateimage = function() {
-  images = shuffle(images);
-  let setsrc = function(i) {
-    image_el.src = images[i];
-    setTimeout(function() {
-      setsrc((i + 1) % images.length);
-    }, 2000);
+let infinite = function() {
+  switch (index % (NUM_IMAGES + 1)) {
+    case 0:
+      images = shuffle(images);
+      break;
+    default:
+      image_el.src = images[index % NUM_IMAGES];
+      break;
   }
-  setsrc(0);
-  setTimeout(updateimage, images.length * 2000);
-};
-
-
-if (!image_el || images.length == 0) {
-  console.log("not showing images");
-} else {
-  updateimage();
+  index++;
+  setTimeout(infinite, 2000);
 }
-
+infinite();
 
 var clamp = function(x, min, max) {
   return Math.min(Math.max(x, min), max);
