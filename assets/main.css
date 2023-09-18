@@ -159,6 +159,7 @@ div.nav-item:hover .book {
 }
 
 @keyframes swivel {
+
   0% {
     transform: rotate(0deg);
   }
