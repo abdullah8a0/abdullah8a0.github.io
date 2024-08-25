@@ -112,6 +112,7 @@
   transition: transform 0.6s ease-in-out;
   transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
+  margin-right: 0.5rem;
 }
 
 div.nav-item:hover .rocket {
@@ -122,6 +123,7 @@ div.nav-item:hover .rocket {
   transition: animation 0.6s ease-in-out;
   transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
+  margin-right: 0.5rem;
 }
 
 @keyframes shake {
@@ -186,6 +188,18 @@ div.nav-item:hover .resume {
   transition: animation 0.3s ease-in-out;
   transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
+  margin-right: 0.5rem;
+}
+
+div.nav-item:hover .blog {
+  animation: swivel 0.3s ease-in-out;
+}
+
+.blog {
+  transition: animation 0.6s ease-in-out;
+  transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  margin-right: 0.5rem;
 }
 
 
@@ -195,16 +209,17 @@ a {
 }
 
 
-.text-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  justify-items: start;
+#contact-bar {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
   padding: 1em 0;
 }
 
 .nav {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
   justify-items: center;
   padding: 0 0 1em 0;
   margin: 1em 1em 0 1em;
@@ -227,11 +242,11 @@ html {
   background-color: var(--background-color);
   scroll-behavior: smooth;
 }
+#executive_summary {
+  display: none;
+}
 
 @media (min-width: 768px) {
-  .text-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
   .project-item-text {
     display: block;
     align-self: center;

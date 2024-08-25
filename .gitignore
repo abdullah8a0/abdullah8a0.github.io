@@ -1,0 +1,32 @@
+
+# Hugo default output directory
+/public/
+
+# Hugo generated files
+/resources/_gen/
+
+# Hugo cache directory
+/.hugo_build.lock
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.swp
+*~
+
+# IDE/Editor folders
+.vscode/
+.idea/
+
+# Node modules (if using npm for any reason)
+node_modules/
+
+# Log files
+*.log
+
+# Executable may be added to repository
+hugo.exe
+hugo.darwin
+hugo.linux

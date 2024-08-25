@@ -1,0 +1,47 @@
+{{ define "main" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Site.Title }} - Under Construction</title>
+    <link rel="stylesheet" href="{{ "assets/main.css" | relURL }}">
+    <style>
+        .construction-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+            text-align: center;
+        }
+        .construction-icon {
+            font-size: 7rem;
+            margin-bottom: 20px;
+        }
+        .construction-title {
+            font-size: 5rem;
+            margin-bottom: 15px;
+            color: var(--my-orange);
+        }
+        .construction-message {
+            font-size: 1.2em;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="construction-container">
+        <div class="construction-icon">🚧</div>
+        <h1 class="construction-title">Under Construction</h1>
+        <p class="construction-message text">
+            Oops! Looks like you found a work in progress.
+            I'm tinkering away to make this page awesome for you.
+            Hang tight, and check back soon—it'll be worth the wait! 👨‍💻
+        </p>
+        <a class="underline" href="{{ "/index.html" | relURL }}" title="Go back to the homepage">Go back to the homepage</a>
+    </div>
+</body>
+</html>
+{{ end }}

@@ -1,3 +1,4 @@
+{{ define "main" }}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,10 +7,8 @@
     <meta name="viewport" content="width=device-width,
     initial-scale=1.0" />
     <meta name="description" content="Abdullah's personal website" />
-    <title>Classes</title>
-    <link rel="stylesheet" href="/assets/main.css" />
-    <!-- TODO: reconcile the two stylesheets -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"> -->
+    <title>{{ .Site.Title }}</title>
+    <link rel="stylesheet" href="{{ "assets/main.css" | relURL }}">
   </head>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-6NJ9Z9W8NT"></script>
@@ -23,24 +22,42 @@
 
   <body>
   <script>0</script>
-  <script defer src="./main.js"></script>
-    <div class="nav"> 
-      <div class="nav-item">
-        <div style="margin-right: 0.5rem;" class="resume">📄</div>
-        <a class="underline" href="/assets/Resume.pdf" title="My Resume!!">Resume</a>
-      </div>
-      <div class="nav-item">
-        <div style="margin-right: 0.5rem;" class="rocket">🚀</div>
-        <a class="underline" href="index.html#projects" title="Projects">Projects</a>
-      </div>
-      <div class="nav-item">
-        <div style="margin-right: 0.5rem;" class="book">📚</div>
-        <a class="underline" href="/classes.html" title="Classes">Classes</a>
-      </div>
+  <script defer src="{{ "js/main.js" | relURL }}"></script>
+  <div class="nav">
+    <div class="nav-item">
+      <div class="resume">📄</div>
+      <a class="underline" href="{{ "assets/Resume.pdf" | relURL }}" title="My Resume!!">Resume</a>
     </div>
+    <div class="nav-item">
+      <div class="rocket">🚀</div>
+      <a class="underline" href="{{ "index.html#projects" | relURL }}" title="Projects">Projects</a>
+    </div>
+    <div class="nav-item">
+      <div class="book">📚</div>
+      <a class="underline" href="{{ "classes" | relURL }}" title="Classes">Classes</a>
+    </div>
+    <div class="nav-item">
+      <div class="blog">📝</div>
+      <a class="underline" href="{{ "notfound" | relURL }}" title="Blog">Blog</a>
+    </div>
+  </div>
     <div class="bar"></div>
     <h3 class="project-title" style="margin: 1rem 0 0 0;">Classes</h3>
     <div class="bar"></div>
+
+    <h4 class="sem-title">Spring 2024</h4>
+    <ul class="text">
+      <li>14.44: Energy Economics and Policy</li>
+      <li>6.1100: Computer Language Engineering</li>
+    </ul>
+
+    <h4 class="sem-title">Fall 2023</h4>
+    <ul class="text">
+      <li>6.1810: Operating Systems Engineering</li>
+      <li>18.424: Seminar in Information Theory</li>
+      <li>14.02: Principles of Macroeconomics</li>
+    </ul>
+
     <h4 class="sem-title">Spring 2023</h4>
     <ul class="text">
       <li>6.5900: Computer System Architecture</li>
@@ -100,3 +117,5 @@
   </body>
 
 </html>
+
+{{ end }}

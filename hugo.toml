@@ -1,0 +1,30 @@
+baseURL = 'https://itsabdullah.dev/'
+languageCode = "en-us"
+title = "Abdullah's Site"
+
+[menu]
+  [[menu.main]]
+    name = "Home"
+    url = "/index.html"
+    weight = 1
+  [[menu.main]]
+    name = "Classes"
+    url = "/classes/"
+    weight = 2
+  [[menu.main]]
+    name = "Not Yet"
+    url = "/notyet.html"
+    weight = 3
+
+[params]
+  custom_css = ["css/main.css"]
+
+
+[outputs]
+  home = ["HTML", "RSS"]
+  page = ["HTML"]
+
+[outputFormats.HTML]
+  mediaType = "text/html"
+  isHTML = true
+  path = ""
