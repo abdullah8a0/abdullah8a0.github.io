@@ -1,0 +1,29 @@
+:root {
+    --background-color: hsl(270, 7%, 13%);
+    --foreground-color: hsl(30, 10%, 85%);
+    --my-orange: #C19C15;
+    --my-light-orange: #e6c85c;
+    --transition-speed: 600ms;
+    --font-stack: 'Open Sans', sans-serif;
+  }
+  
+* {
+font-family: var(--font-stack);
+color: var(--foreground-color);
+}
+
+body {
+  max-width: 768px;
+  height: 100vh;
+  margin: 0 auto;
+  padding: 0 1em;
+  background-color: var(--background-color);
+}
+
+html {
+  background-color: var(--background-color);
+  scroll-behavior: smooth;
+}
+
+@media (min-width: 768px) {
+}

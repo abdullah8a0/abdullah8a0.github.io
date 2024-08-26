@@ -11,6 +11,19 @@
   font-family: var(--font-stack);
 }
 
+body {
+  max-width: 768px;
+  height: 100vh;
+  margin: 0 auto;
+  padding: 0 1em;
+  background-color: var(--background-color);
+}
+
+html {
+  background-color: var(--background-color);
+  scroll-behavior: smooth;
+}
+
 .text {
   font-size: 1em;
   font-weight: 400;
@@ -230,20 +243,8 @@ a {
   border-bottom: 1px solid var(--my-orange);
 }
 
-body {
-  max-width: 768px;
-  height: 100vh;
-  margin: 0 auto;
-  padding: 0 1em;
-  background-color: var(--background-color);
-}
-
-html {
-  background-color: var(--background-color);
-  scroll-behavior: smooth;
-}
 #executive_summary {
-  display: none;
+  font-size: 0;
 }
 
 @media (min-width: 768px) {
