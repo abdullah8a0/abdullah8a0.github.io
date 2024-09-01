@@ -1,6 +1,6 @@
 baseURL = 'https://itsabdullah.dev/'
 languageCode = "en-us"
-title = "Abdullah's Site"
+title = "Abid Abdullah"
 
 [menu]
   [[menu.main]]
