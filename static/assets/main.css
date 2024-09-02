@@ -92,7 +92,7 @@ html {
 .project-title {
   font-size: 2em;
   font-weight: 400;
-  line-height: 1.7em;
+  line-height: 1.4em;
   color: var(--foreground-color);
   display: block;
 }
