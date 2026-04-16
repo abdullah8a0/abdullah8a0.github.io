@@ -3,7 +3,7 @@ var SITE = {
   hostname: "itsabdullah.dev",
   home: "/home/abdullah",
 
-  identity: "Abdullah. MIT CS + Math graduate. R&D engineer at Siemens EDA working on solver performance and design verification.",
+  identity: "Abdullah. MIT CS + Math, MEng in progress. MEng student at MIT CSAIL (MATCHA Lab), working on formal verification of out-of-order RISC-V. Previously: R&D at Siemens EDA.",
 
   fs: {
     "resume.pdf": { url: "/assets/Resume.pdf", content: "Resume \u2014 Abdullah (PDF)" },
@@ -31,16 +31,6 @@ var SITE = {
   },
 
   theme: "brutalist",
-
-  themes: ["default", "tty", "crt", "brutalist", "float"],
-
-  themeLabels: {
-    default: "macOS",
-    tty: "TTY",
-    crt: "CRT",
-    brutalist: "Brutal",
-    float: "Float"
-  },
 
   intro: {
     staleAfter: 1000 // 1s for testing, use 3600000 for 1 hour

@@ -10,7 +10,6 @@
         <span></span>
       </div>
       <p data-terminal-title>abdullah@itsabdullah.dev:~</p>
-      <button class="terminal-skip" type="button" data-terminal-skip hidden>skip</button>
     </div>
 
     <div class="terminal-screen" aria-label="Portfolio terminal transcript">
@@ -25,27 +24,27 @@
         <dl class="identity-grid">
           <div>
             <dt>role</dt>
-            <dd>R&D engineer at Siemens EDA, focused on solver performance and design verification.</dd>
+            <dd>MEng student at MIT CSAIL (MATCHA Lab). Formal verification of out-of-order RISC-V. Previously: R&D at Siemens EDA.</dd>
           </div>
           <div>
             <dt>education</dt>
-            <dd>MIT computer science and mathematics graduate.</dd>
+            <dd>MIT CS + Math, MEng in progress.</dd>
           </div>
           <div>
             <dt>interests</dt>
-            <dd>hardware/software co-design, computer architecture, formal methods, security.</dd>
+            <dd>computer architecture, hardware/software co-design, formal methods, security.</dd>
           </div>
         </dl>
 
-        <div class="terminal-group">
+        <div class="terminal-group" data-terminal-links>
           <p class="terminal-label">projects</p>
           <a href="https://github.com/itstorque/u2f">u2f-security-key</a>
           <a href="https://github.com/abdullah8a0/one-chan">onechan</a>
           <a href="https://github.com/abdullah8a0/profemon">profemon</a>
         </div>
 
-        <div class="terminal-group">
-          <p class="terminal-label">routes</p>
+        <div class="terminal-group" data-terminal-links>
+          <p class="terminal-label">links</p>
           <a href="{{ "assets/Resume.pdf" | relURL }}">resume.pdf</a>
           <a href="mailto:abdullah8a0@gmail.com">email</a>
           <a href="https://github.com/abdullah8a0/">github</a>
@@ -62,7 +61,6 @@
         <div class="terminal-input-wrap">
           <input id="terminal-input" data-terminal-input name="command" type="text" spellcheck="false" autocapitalize="none" autocorrect="off" autocomplete="off" aria-autocomplete="list" aria-describedby="terminal-hint" />
           <span class="terminal-ghost" data-terminal-ghost aria-hidden="true"></span>
-          <span class="terminal-input-caret" data-terminal-caret aria-hidden="true"></span>
         </div>
       </form>
     </div>

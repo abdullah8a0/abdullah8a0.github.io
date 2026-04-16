@@ -9,12 +9,10 @@
     command: terminal.querySelector("[data-terminal-command]"),
     output: terminal.querySelector("[data-terminal-output]"),
     screen: terminal.querySelector(".terminal-screen"),
-    skip: terminal.querySelector("[data-terminal-skip]"),
     form: terminal.querySelector("[data-terminal-form]"),
     input: terminal.querySelector("[data-terminal-input]"),
     history: terminal.querySelector("[data-terminal-history]"),
     ghost: terminal.querySelector("[data-terminal-ghost]"),
-    caret: terminal.querySelector("[data-terminal-caret]"),
     title: terminal.querySelector("[data-terminal-title]")
   };
 
@@ -243,8 +241,17 @@
     var parts = normalized.split(/\s+/);
     if (!normalized) return "";
     var handler = commands[parts[0]];
-    if (handler) return handler(rawCommand, parts);
-    return "<p>command not found: " + escapeHtml(rawCommand) + ". Try " + tag("strong", "help") + ".</p>";
+    if (handler) {
+      confusionCount = 0;
+      return handler(rawCommand, parts);
+    }
+    confusionCount++;
+    if (confusionCount >= 2) revealLinks();
+    var msg = "<p>command not found: " + escapeHtml(rawCommand) + ". Try " + tag("strong", "help") + ".</p>";
+    if (confusionCount >= 2 && !isTouch) {
+      msg += "<p>hint: scroll up for clickable links.</p>";
+    }
+    return msg;
   }
 
   /* ── Tab completion ── */
@@ -314,19 +321,7 @@
     dom.ghost.textContent = completion ? dom.input.value + completion : "";
   }
 
-  var measureCtx = null;
-  function measureText(text) {
-    if (!measureCtx) measureCtx = document.createElement("canvas").getContext("2d");
-    if (dom.input) measureCtx.font = getComputedStyle(dom.input).font;
-    return measureCtx.measureText(text).width;
-  }
-
-  function updateCaret() {
-    if (!dom.caret || !dom.input) return;
-    dom.caret.style.left = measureText(dom.input.value.slice(0, dom.input.selectionStart)) + "px";
-  }
-
-  function refreshInput() { updateGhost(); updateCaret(); }
+  function refreshInput() { updateGhost(); }
 
   /* ── Intro animation ── */
 
@@ -339,8 +334,8 @@
     if (dom.command) dom.command.textContent = introCommand;
     if (dom.output) { dom.output.hidden = false; dom.output.classList.add("is-visible"); }
     if (dom.form) dom.form.hidden = false;
-    if (dom.skip) dom.skip.hidden = true;
     sessionStorage.setItem("terminalSeen", Date.now().toString());
+    startIdleTimer();
     window.setTimeout(function() {
       if (dom.screen) dom.screen.scrollTop = dom.screen.scrollHeight;
       if (dom.input) dom.input.focus();
@@ -352,7 +347,6 @@
     dom.command.textContent = "";
     dom.output.hidden = true;
     if (dom.form) dom.form.hidden = true;
-    if (dom.skip) dom.skip.hidden = false;
     await delay(520);
     dom.line.classList.add("is-active");
     for (var i = 0; i <= introCommand.length; i++) {
@@ -363,6 +357,36 @@
     if (cancelled) return;
     await delay(170);
     showIntro();
+  }
+
+  /* ── Progressive disclosure ── */
+
+  var isTouch = window.matchMedia("(pointer: coarse)").matches;
+  var linksRevealed = isTouch;
+  var confusionCount = 0;
+  var clickCount = 0;
+  var hasTyped = false;
+  var idleTimer = null;
+
+  function revealLinks() {
+    if (linksRevealed) return;
+    linksRevealed = true;
+    if (idleTimer) clearTimeout(idleTimer);
+    var groups = terminal.querySelectorAll("[data-terminal-links]");
+    for (var i = 0; i < groups.length; i++) {
+      groups[i].classList.add("is-revealed");
+    }
+  }
+
+  function startIdleTimer() {
+    if (linksRevealed) return;
+    idleTimer = setTimeout(revealLinks, 10000);
+  }
+
+  function resetIdleTimer() {
+    if (linksRevealed) return;
+    if (idleTimer) clearTimeout(idleTimer);
+    startIdleTimer();
   }
 
   /* ── History ── */
@@ -391,10 +415,6 @@
 
   /* ── Event wiring ── */
 
-  if (dom.skip) {
-    dom.skip.addEventListener("click", function() { cancelled = true; showIntro(); });
-  }
-
   if (dom.form && dom.input) {
     dom.form.addEventListener("submit", function(event) {
       event.preventDefault();
@@ -407,9 +427,11 @@
       }
       var response = responseFor(raw);
       if (response !== null) appendHistory(raw, response);
+      resetIdleTimer();
     });
 
     dom.input.addEventListener("keydown", function(event) {
+      resetIdleTimer();
       if (event.key === "ArrowUp") {
         event.preventDefault();
         if (!inputHistory.length) return;
@@ -433,16 +455,21 @@
           dom.input.value += completion;
           refreshInput();
         }
-      } else if (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End") {
-        setTimeout(updateCaret, 0);
       }
     });
 
-    dom.input.addEventListener("input", refreshInput);
+    dom.input.addEventListener("input", function() {
+      hasTyped = true;
+      refreshInput();
+    });
   }
 
   terminal.addEventListener("click", function(event) {
     if (event.target instanceof HTMLAnchorElement || event.target instanceof HTMLButtonElement) return;
+    if (!hasTyped) {
+      clickCount++;
+      if (clickCount >= 2) revealLinks();
+    }
     if (dom.input) dom.input.focus();
   });
 
@@ -450,29 +477,11 @@
     if (dom.input) dom.input.focus();
   });
 
-  /* ── Theme switcher ── */
+  /* ── Theme ── */
 
-  function setTheme(name) {
-    if (name === "default") terminal.removeAttribute("data-theme");
-    else terminal.setAttribute("data-theme", name);
-    var btns = document.querySelectorAll("[data-theme-btn]");
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].classList.toggle("is-active", btns[i].dataset.themeBtn === name);
-    }
+  if (conf.theme && conf.theme !== "default") {
+    terminal.setAttribute("data-theme", conf.theme);
   }
-
-  var switcher = document.createElement("div");
-  switcher.className = "theme-switcher";
-  conf.themes.forEach(function(name) {
-    var btn = document.createElement("button");
-    btn.textContent = conf.themeLabels[name] || name;
-    btn.dataset.themeBtn = name;
-    if (name === conf.theme) btn.classList.add("is-active");
-    btn.addEventListener("click", function() { setTheme(name); });
-    switcher.appendChild(btn);
-  });
-  document.body.appendChild(switcher);
-  setTheme(conf.theme);
 
   /* ── Init ── */
 
