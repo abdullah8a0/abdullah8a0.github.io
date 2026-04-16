@@ -1,6 +1,6 @@
 var SITE = {
   user: "abdullah",
-  hostname: "itsabdullah.dev",
+  hostname: "fixpoint.cc",
   home: "/home/abdullah",
 
   identity: "Abdullah. MIT CS + Math, MEng in progress. MEng student at MIT CSAIL (MATCHA Lab), working on formal verification of out-of-order RISC-V. Previously: R&D at Siemens EDA.",
