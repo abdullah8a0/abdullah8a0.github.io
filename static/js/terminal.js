@@ -485,8 +485,11 @@
 
   /* ── Init ── */
 
+  var navEntry = performance.getEntriesByType("navigation")[0];
+  var isReload = navEntry && navEntry.type === "reload";
   var lastSeen = Number(sessionStorage.getItem("terminalSeen") || 0);
-  if (prefersReducedMotion || (lastSeen && Date.now() - lastSeen < conf.intro.staleAfter)) {
+  var skipIntro = !isReload && lastSeen && Date.now() - lastSeen < conf.intro.staleAfter;
+  if (prefersReducedMotion || skipIntro) {
     showIntro();
   } else {
     runIntro();

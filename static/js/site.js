@@ -33,6 +33,6 @@ var SITE = {
   theme: "brutalist",
 
   intro: {
-    staleAfter: 1000 // 1s for testing, use 3600000 for 1 hour
+    staleAfter: 600000 // 10 minutes
   }
 };
