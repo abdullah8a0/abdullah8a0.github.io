@@ -31,6 +31,7 @@ var SITE = {
   },
 
   theme: "brutalist",
+  themes: ["default", "brutalist", "tty", "crt", "float"],
 
   intro: {
     staleAfter: 600000 // 10 minutes
