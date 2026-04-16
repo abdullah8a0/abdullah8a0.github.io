@@ -12,13 +12,9 @@ title = "Abid Abdullah"
     url = "/classes/"
     weight = 2
   [[menu.main]]
-    name = "Not Yet"
-    url = "/notyet.html"
+    name = "Contact"
+    url = "/#contact"
     weight = 3
-
-[params]
-  custom_css = ["css/main.css"]
-
 
 [outputs]
   home = ["HTML", "RSS"]

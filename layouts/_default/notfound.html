@@ -1,0 +1,12 @@
+{{ define "main" }}
+{{ partial "nav.html" . }}
+<div class="construction-container">
+  <div class="construction-icon">🚧</div>
+  <h1 class="construction-title">Under Construction</h1>
+  <p class="construction-message text">
+    Oops! Looks like you found a work in progress.
+    Hang tight, and check back soon—it'll be worth the wait! 👨‍💻
+  </p>
+  <a class="underline" href="{{ "/index.html" | relURL }}" title="Go back to the homepage">Go back to the homepage</a>
+</div>
+{{ end }}
