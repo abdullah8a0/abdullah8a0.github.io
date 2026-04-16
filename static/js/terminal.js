@@ -403,10 +403,12 @@
   };
 
   commands.vim = function() {
-    return "<p>you're stuck now. just kidding — there's no vim here.</p>";
+    return "<p>consider trying emacs.</p>";
   };
 
-  commands.nano = commands.vim;
+  commands.emacs = function() {
+    return "<p>consider trying vim.</p>";
+  };
 
   commands.exit = function() {
     terminal.style.transition = "opacity 0.5s ease-out";
