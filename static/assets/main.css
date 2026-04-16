@@ -297,11 +297,17 @@ dd {
 
 @media (pointer: fine) {
   [data-terminal-links] {
-    display: none;
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
   }
 
   [data-terminal-links].is-revealed {
-    display: flex;
+    visibility: visible;
+    height: auto;
+    margin-top: 0.85rem;
+    overflow: visible;
     animation: links-in 300ms ease-out;
   }
 }
