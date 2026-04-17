@@ -186,7 +186,7 @@
   };
 
   commands.cat = function(raw, parts) {
-    if (!parts[1]) return "<p>usage: cat &lt;file&gt;</p>";
+    if (!parts[1]) return "<p>meow.</p>";
     var path = parts.slice(1).join(" ");
     var segments = resolvePath(path);
     if (segments === null) return "<p>cat: " + escapeHtml(path) + ": No such file</p>";
