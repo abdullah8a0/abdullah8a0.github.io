@@ -147,8 +147,9 @@
 
   commands.help = function() {
     return [
-      "<p>commands: whoami, ls [-al], cd, cat, open, pwd, date, clear</p>",
-      "<p>tip: " + tag("strong", "tab") + " to autocomplete, " + tag("strong", "\u2191\u2193") + " for history</p>"
+      "<p>commands: whoami, ls, cd, cat, open, pwd, date, echo, clear,</p>",
+      "<p>          theme, neofetch, tree, history, grep, man</p>",
+      "<p>tip: " + tag("strong", "tab") + " to autocomplete, " + tag("strong", "\u2191\u2193") + " for history, " + tag("strong", "man &lt;cmd&gt;") + " for details</p>"
     ].join("");
   };
 
@@ -193,8 +194,11 @@
     if (!node) return "<p>cat: " + escapeHtml(path) + ": No such file</p>";
     if (isDir(node)) return "<p>cat: " + escapeHtml(path) + ": Is a directory</p>";
     var out = "";
-    if (node.content) out += "<p>" + escapeHtml(node.content) + "</p>";
-    if (node.url) out += "<p>\u2192 " + link(node.url, node.url) + "</p>";
+    if (node.content) {
+      if (node.url) out += "<p>" + link(escapeHtml(node.content), node.url) + "</p>";
+      else out += "<p>" + escapeHtml(node.content) + "</p>";
+    }
+    if (node.url) out += "<p>\u2192 " + link(escapeHtml(node.url), node.url) + "</p>";
     return out || "<p>(empty)</p>";
   };
 
@@ -234,6 +238,188 @@
     return "<p>nice try.</p>";
   };
 
+  /* ── theme command ── */
+
+  commands.theme = function(raw, parts) {
+    var name = parts[1];
+    if (!name) {
+      var current = terminal.getAttribute("data-theme") || "default";
+      return "<p>current: " + escapeHtml(current) + "</p>" +
+        "<p>available: " + conf.themes.join(", ") + "</p>";
+    }
+    if (conf.themes.indexOf(name) < 0) {
+      return "<p>theme: '" + escapeHtml(name) + "' not found. available: " + conf.themes.join(", ") + "</p>";
+    }
+    if (name === "default") {
+      terminal.removeAttribute("data-theme");
+    } else {
+      terminal.setAttribute("data-theme", name);
+    }
+    try { localStorage.setItem("terminal-theme", name); } catch(e) {}
+    return "<p>switched to " + escapeHtml(name) + "</p>";
+  };
+
+  /* ── neofetch command ── */
+
+  commands.neofetch = function() {
+    var current = terminal.getAttribute("data-theme") || "default";
+    var art = [
+      "   ___  _                  _       _   ",
+      "  / __)(_)_  _ ____   ___ (_)____ | |_ ",
+      " | (__  _ \\ \\/ |  _ \\ / _ \\| |  _ \\| __|",
+      " | |   | | )  (| |_) | (_) | | | | | |_ ",
+      " |_|   |_|/ /\\_\\  __/ \\___/|_|_| |_|\\__|",
+      "              |_|                        "
+    ];
+    var info = [
+      tag("strong", conf.user) + "@" + tag("strong", conf.hostname),
+      "──────────────────",
+      tag("neofetch-label", "OS") + ": fixpoint.cc",
+      tag("neofetch-label", "Kernel") + ": Hugo",
+      tag("neofetch-label", "Shell") + ": terminal.js",
+      tag("neofetch-label", "Theme") + ": " + current,
+      tag("neofetch-label", "Terminal") + ": " + conf.hostname,
+      tag("neofetch-label", "Uptime") + ": " + Math.floor((Date.now() - performance.timeOrigin) / 1000) + "s"
+    ];
+    var lines = [];
+    var max = Math.max(art.length, info.length);
+    for (var i = 0; i < max; i++) {
+      var left = (i < art.length ? art[i] : "").padEnd(42);
+      var right = i < info.length ? info[i] : "";
+      lines.push(tag("neofetch-art", escapeHtml(left)) + "  " + right);
+    }
+    return '<div class="ls-long">' + lines.join("\n") + "</div>";
+  };
+
+  /* ── tree command ── */
+
+  function buildTree(node, prefix, isLast) {
+    var lines = [];
+    var names = Object.keys(node.children);
+    for (var i = 0; i < names.length; i++) {
+      var name = names[i];
+      var child = node.children[name];
+      var last = i === names.length - 1;
+      var connector = last ? "└── " : "├── ";
+      var display = escapeHtml(name);
+      if (isDir(child)) display = tag("ls-dir", display + "/");
+      else if (child.url) display = tag("ls-link", display);
+      lines.push(prefix + connector + display);
+      if (isDir(child)) {
+        var childPrefix = prefix + (last ? "    " : "│   ");
+        lines = lines.concat(buildTree(child, childPrefix, last));
+      }
+    }
+    return lines;
+  }
+
+  commands.tree = function(raw, parts) {
+    var target = parts[1] || ".";
+    var segments = resolvePath(target);
+    if (segments === null) return "<p>tree: '" + escapeHtml(target) + "': No such directory</p>";
+    var node = getNode(segments);
+    if (!node || !isDir(node)) return "<p>tree: '" + escapeHtml(target) + "': Not a directory</p>";
+    var header = escapeHtml(target === "." ? cwdString() : target);
+    var treeLines = buildTree(node, "", false);
+    return '<div class="ls-long">' + tag("ls-dir", header) + "\n" + treeLines.join("\n") + "</div>";
+  };
+
+  /* ── history command ── */
+
+  commands.history = function() {
+    if (!inputHistory.length) return "<p>no history</p>";
+    var lines = inputHistory.map(function(cmd, i) {
+      return "  " + String(i + 1).padStart(4) + "  " + escapeHtml(cmd);
+    });
+    return '<div class="ls-long">' + lines.join("\n") + "</div>";
+  };
+
+  /* ── grep command ── */
+
+  function grepFs(node, path, pattern, results) {
+    var names = Object.keys(node.children);
+    for (var i = 0; i < names.length; i++) {
+      var name = names[i];
+      var child = node.children[name];
+      var fullPath = path ? path + "/" + name : name;
+      if (isDir(child)) {
+        grepFs(child, fullPath, pattern, results);
+      } else if (child.content && child.content.toLowerCase().indexOf(pattern) >= 0) {
+        results.push({ path: fullPath, content: child.content });
+      }
+    }
+  }
+
+  commands.grep = function(raw, parts) {
+    if (!parts[1]) return "<p>usage: grep &lt;pattern&gt;</p>";
+    var pattern = parts[1].toLowerCase();
+    var results = [];
+    grepFs(fsRoot, "", pattern, results);
+    if (!results.length) return "<p>no matches</p>";
+    var lines = results.map(function(r) {
+      return tag("ls-dir", escapeHtml(r.path)) + ": " + escapeHtml(r.content);
+    });
+    return "<div>" + lines.map(function(l) { return "<p>" + l + "</p>"; }).join("") + "</div>";
+  };
+
+  /* ── man command ── */
+
+  var manPages = {
+    help:    { synopsis: "help", desc: "List available commands and keyboard shortcuts." },
+    whoami:  { synopsis: "whoami", desc: "Display identity and background information." },
+    about:   { synopsis: "about", desc: "Alias for whoami." },
+    ls:      { synopsis: "ls [-a] [-l] [path]", desc: "List directory contents. -a shows hidden entries (. and ..), -l shows long format with permissions." },
+    cd:      { synopsis: "cd [path]", desc: "Change working directory. Supports ~, .., and relative/absolute paths." },
+    cat:     { synopsis: "cat <file>", desc: "Display file contents and associated URL." },
+    open:    { synopsis: "open <file>", desc: "Open a file's URL in the browser. Also accepts shortcut names (resume, email, github, linkedin)." },
+    pwd:     { synopsis: "pwd", desc: "Print the current working directory." },
+    date:    { synopsis: "date", desc: "Display the current date and time." },
+    echo:    { synopsis: "echo <text>", desc: "Print text to the terminal." },
+    clear:   { synopsis: "clear", desc: "Clear the command history." },
+    theme:   { synopsis: "theme [name]", desc: "Switch terminal theme. Without arguments, shows current theme and available options." },
+    neofetch:{ synopsis: "neofetch", desc: "Display system information with ASCII art." },
+    tree:    { synopsis: "tree [path]", desc: "Display the filesystem as an indented tree." },
+    history: { synopsis: "history", desc: "Show previously entered commands." },
+    grep:    { synopsis: "grep <pattern>", desc: "Search all files in the filesystem for a text pattern." },
+    man:     { synopsis: "man <command>", desc: "Show the manual page for a command." }
+  };
+
+  commands.man = function(raw, parts) {
+    if (!parts[1]) return "<p>usage: man &lt;command&gt;</p>";
+    var page = manPages[parts[1]];
+    if (!page) return "<p>No manual entry for " + escapeHtml(parts[1]) + "</p>";
+    return '<div class="ls-long">' +
+      tag("strong", escapeHtml(parts[1].toUpperCase())) + "\n\n" +
+      tag("neofetch-label", "SYNOPSIS") + "\n    " + escapeHtml(page.synopsis) + "\n\n" +
+      tag("neofetch-label", "DESCRIPTION") + "\n    " + escapeHtml(page.desc) +
+      "</div>";
+  };
+
+  /* ── Easter eggs ── */
+
+  commands["rm"] = function(raw) {
+    if (raw.indexOf("-rf") >= 0) return "<p>nice try.</p>";
+    return "<p>rm: insufficient permissions</p>";
+  };
+
+  commands.vim = function() {
+    return "<p>consider trying emacs.</p>";
+  };
+
+  commands.emacs = function() {
+    return "<p>consider trying vim.</p>";
+  };
+
+  commands.exit = function() {
+    terminal.style.transition = "opacity 0.5s ease-out";
+    terminal.style.opacity = "0";
+    setTimeout(function() {
+      terminal.innerHTML = '<div style="display:grid;height:100%;place-items:center;opacity:0;animation:links-in 0.5s ease-out forwards;"><p style="color:var(--muted);font-family:var(--mono);">connection closed.</p></div>';
+      terminal.style.opacity = "1";
+    }, 600);
+    return null;
+  };
+
   var commandNames = Object.keys(commands);
 
   function responseFor(rawCommand) {
@@ -264,7 +450,7 @@
     if (tokens.length <= 1) {
       var matches = commandNames.filter(function(c) { return c.indexOf(cmd) === 0 && c !== cmd; });
       if (matches.length === 1) {
-        var needsArg = ["open", "cat", "cd", "ls", "echo"].indexOf(matches[0]) >= 0;
+        var needsArg = ["open", "cat", "cd", "ls", "echo", "theme", "tree", "grep", "man"].indexOf(matches[0]) >= 0;
         return matches[0].slice(cmd.length) + (needsArg ? " " : "");
       }
       return "";
@@ -479,8 +665,11 @@
 
   /* ── Theme ── */
 
-  if (conf.theme && conf.theme !== "default") {
-    terminal.setAttribute("data-theme", conf.theme);
+  var savedTheme;
+  try { savedTheme = localStorage.getItem("terminal-theme"); } catch(e) {}
+  var activeTheme = savedTheme || conf.theme;
+  if (activeTheme && activeTheme !== "default") {
+    terminal.setAttribute("data-theme", activeTheme);
   }
 
   /* ── Init ── */

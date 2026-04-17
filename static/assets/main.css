@@ -297,11 +297,17 @@ dd {
 
 @media (pointer: fine) {
   [data-terminal-links] {
-    display: none;
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
   }
 
   [data-terminal-links].is-revealed {
-    display: flex;
+    visibility: visible;
+    height: auto;
+    margin-top: 0.85rem;
+    overflow: visible;
     animation: links-in 300ms ease-out;
   }
 }
@@ -351,6 +357,8 @@ dd {
 .ls-link { color: var(--cyan); }
 .ls-perms { color: var(--muted); }
 .ls-long { white-space: pre; line-height: 1.8; }
+.neofetch-art { color: var(--green); }
+.neofetch-label { color: var(--green); font-weight: 700; }
 
 .terminal-input-line {
   margin-top: 1rem;

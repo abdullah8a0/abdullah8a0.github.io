@@ -4,7 +4,7 @@ This is the canonical contributor guide for both Codex and Claude. `CLAUDE.md` s
 
 ## Project Structure & Module Organization
 
-This repository is a Hugo static site for `itsabdullah.dev`. Site configuration lives in `hugo.toml`; deployment uses `.github/workflows/hugo.yml`; the custom domain is configured by `CNAME`. Content files live in `content/`, with page-specific layouts selected through front matter such as `layout: classes`.
+This repository is a Hugo static site for `fixpoint.cc`. Site configuration lives in `hugo.toml`; deployment uses `.github/workflows/hugo.yml`; the custom domain is configured by `CNAME`. Content files live in `content/`, with page-specific layouts selected through front matter such as `layout: classes`.
 
 Templates are custom and live in `layouts/`. The homepage is `layouts/index.html` and is currently a minimal terminal-only interface. Shared document structure and metadata live in `layouts/_default/baseof.html` and `layouts/partials/head.html`; `layouts/partials/nav.html` is used by supporting pages. Static assets live in `static/`, with CSS in `static/assets/main.css`, JavaScript in `static/js/main.js`, PDFs in `static/assets/`, and images in `static/assets/img/`. Do not edit `public/`; Hugo generates it and Git ignores it.
 
