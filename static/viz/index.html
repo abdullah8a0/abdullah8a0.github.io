@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AIG CDCL Visualizer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>aig-cdcl</h1>
+    <select id="circuit-select"></select>
+    <span class="meta">level: <span id="dl">0</span></span>
+    <span class="meta" id="status">idle</span>
+    <button id="step" disabled>step</button>
+    <button id="auto" disabled>auto</button>
+    <button id="undo">undo</button>
+    <button id="reset">reset</button>
+    <label class="meta"><input type="checkbox" id="minimize" checked> minimize</label>
+    <input type="file" id="aiger-file" accept=".aig" style="display:none">
+    <button id="load-aig">load .aig</button>
+  </header>
+  <div id="canvas"></div>
+  <footer>
+    <div><span class="label">trail:</span><span id="trail"></span></div>
+    <div><span class="label">learned:</span><span id="learned"></span></div>
+    <div id="analysis"></div>
+  </footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
