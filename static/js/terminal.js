@@ -397,7 +397,7 @@
   };
 
   commands.viz = function() {
-    window.location.href = "/viz/";
+    window.location.href = "/viz/brutalist.html";
     return "<p>launching visualizer...</p>";
   };
 

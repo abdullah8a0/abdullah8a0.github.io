@@ -20,11 +20,15 @@ rm -f public/viz/editorial.html
 rm -f public/viz/editorial.css
 rm -f public/viz/js/tweaks-editorial.js
 
-# Promote the brutalist shell to /viz/ and strip its variants-switcher nav
-# (the other two targets no longer exist in production).
-mv public/viz/brutalist.html public/viz/index.html
-# Portable multi-line delete via sed — works on GNU and BSD.
+# Make the brutalist shell reachable at both /viz/ and /viz/brutalist.html
+# so the terminal `viz` command (→ /viz/brutalist.html) keeps working.
+cp public/viz/brutalist.html public/viz/index.html
+
+# Strip the variants-switcher nav from both copies (editorial and the old
+# default no longer exist, so their links would 404).
+# Portable multi-line delete — works on both GNU and BSD sed.
 sed -i.bak '/PROD-STRIP-BEGIN/,/PROD-STRIP-END/d' public/viz/index.html
-rm -f public/viz/index.html.bak
+sed -i.bak '/PROD-STRIP-BEGIN/,/PROD-STRIP-END/d' public/viz/brutalist.html
+rm -f public/viz/index.html.bak public/viz/brutalist.html.bak
 
 echo "build.sh: production output trimmed — only the brutalist /viz/ variant remains"
