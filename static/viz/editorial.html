@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AIG · CDCL — a writing on the solver</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="editorial.css?v=3">
+</head>
+<body>
+
+<!-- masthead ------------------------------------------------------------- -->
+<header class="masthead">
+  <div class="mast-left">
+    <div class="eyebrow">Vol. I · Plate 03</div>
+    <h1 class="title">The Conflict‑Driven Clause‑Learning <em>Machine</em></h1>
+    <p class="dek">
+      A working illustration of CDCL running on an And‑Inverter Graph —
+      decisions are propagated, conflicts are analysed, clauses are learned,
+      and the solver backjumps through the stack of reasons until the formula
+      is settled, one way or the other.
+    </p>
+  </div>
+  <div class="mast-right">
+    <div class="kv"><span class="k">decision level</span><span class="v" id="dl">0</span></div>
+    <div class="kv"><span class="k">status</span><span class="v status-pill" id="status">idle</span></div>
+  </div>
+</header>
+
+<!-- ruler --------------------------------------------------------------- -->
+<nav class="rule-nav">
+  <div class="nav-l">
+    <label class="field">
+      <span class="flabel">Figure</span>
+      <select id="circuit-select" class="select"></select>
+    </label>
+    <button id="load-aig" class="btn ghost">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M8 2v9M4 7l4 4 4-4M2 13h12"/>
+      </svg>
+      <span>import .aig</span>
+    </button>
+    <input type="file" id="aiger-file" accept=".aig" hidden>
+  </div>
+  <div class="nav-r">
+    <label class="toggle">
+      <input type="checkbox" id="minimize" checked>
+      <span>minimize clauses</span>
+    </label>
+  </div>
+</nav>
+
+<!-- figure --------------------------------------------------------------- -->
+<main class="figure">
+  <figcaption class="fig-caption">
+    <span class="fig-num">Fig. 01</span>
+    <span class="fig-desc">The circuit under examination. Primary inputs are drawn
+      as circles; And gates as the familiar D‑shape. Edges coloured
+      <em class="swatch-t">green</em> carry truth; edges coloured
+      <em class="swatch-f">vermillion</em> carry falsehood. Dashed boxes are
+      learned clauses, accrued over the course of the solve.</span>
+  </figcaption>
+
+  <div class="fig-frame">
+    <div class="canvas-wrap" id="canvas-wrap">
+      <div id="canvas"></div>
+      <div class="minimap" id="minimap">
+        <svg id="minimap-svg" viewBox="0 0 1060 680" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="minimap-viewport" id="minimap-vp"></div>
+      </div>
+
+      <!-- overlay legend (subtle, corner) --------------------------------- -->
+      <div class="legend">
+        <div class="lg-row"><span class="sw sw-t"></span><span>= 1</span></div>
+        <div class="lg-row"><span class="sw sw-f"></span><span>= 0</span></div>
+        <div class="lg-row"><span class="sw sw-j"></span><span>j‑frontier</span></div>
+      </div>
+    </div>
+
+    <!-- transport ----------------------------------------------------- -->
+    <div class="transport">
+      <div class="tp-left">
+        <button class="tp-btn" id="undo" title="Undo (←)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3L2 8l5 5M2 8h8a4 4 0 010 8"/></svg>
+        </button>
+        <button class="tp-btn tp-primary" id="auto" title="Auto-resolve conflict (Space)">
+          <svg class="pp-play"  width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M3 1.5l9 5.5-9 5.5z"/></svg>
+          <svg class="pp-pause" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" hidden><rect x="2" y="1.5" width="3" height="9"/><rect x="7" y="1.5" width="3" height="9"/></svg>
+        </button>
+        <button class="tp-btn" id="step" title="Step one resolution (→)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3l5 5-5 5M11 3v10"/></svg>
+        </button>
+        <button class="tp-btn" id="reset" title="Reset (R)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8a4.5 4.5 0 108-2.8M12 3v3h-3"/></svg>
+        </button>
+      </div>
+      <button class="tp-help" onclick="document.getElementById('help-overlay').hidden = false" title="Keyboard shortcuts (?)">?</button>
+    </div>
+  </div>
+</main>
+
+<!-- commentary -------------------------------------------------------- -->
+<section class="commentary" aria-label="solver commentary">
+  <article class="col col-trail">
+    <header class="col-head">
+      <span class="col-num">§ I</span>
+      <h2 class="col-title">The Trail</h2>
+      <span class="col-meta" id="trail-count">—</span>
+    </header>
+    <p class="col-intro">
+      Each entry is an assignment, ordered as the solver discovered it.
+      Decisions — the brave guesses — sit above their forced consequences.
+    </p>
+    <div class="col-body" id="trail"></div>
+  </article>
+
+  <article class="col col-learned">
+    <header class="col-head">
+      <span class="col-num">§ II</span>
+      <h2 class="col-title">Learned Clauses</h2>
+      <span class="col-meta" id="learned-count">—</span>
+    </header>
+    <p class="col-intro">
+      Every conflict teaches the solver a new constraint. These refinements
+      carry forward; they prune the search on every future decision.
+    </p>
+    <div class="col-body" id="learned"></div>
+  </article>
+
+  <article class="col col-analysis">
+    <header class="col-head">
+      <span class="col-num">§ III</span>
+      <h2 class="col-title">Conflict Analysis</h2>
+      <span class="col-meta" id="analysis-meta">—</span>
+    </header>
+    <p class="col-intro">
+      When the assignment falsifies a gate, we trace the chain of reasons
+      backward to a first unique implication point.
+    </p>
+    <div class="col-body" id="analysis"></div>
+  </article>
+</section>
+
+<!-- colophon ---------------------------------------------------------- -->
+<footer class="colophon">
+  <span>fixpoint.cc — a.abdullah · aig cdcl</span>
+  <span class="dot">·</span>
+  <nav class="variants-nav" aria-label="theme variants">
+    <span class="v-k">variants:</span>
+    <a class="v-link" href="./">default</a>
+    <span class="v-sep">/</span>
+    <a class="v-link" href="brutalist.html">brutalist</a>
+    <span class="v-sep">/</span>
+    <a class="v-link active" href="editorial.html">editorial</a>
+  </nav>
+  <span class="dot">·</span>
+  <span>Set in Newsreader &amp; IBM Plex</span>
+</footer>
+
+<!-- help overlay ------------------------------------------------------ -->
+<div id="help-overlay" class="help-overlay" hidden>
+  <div class="help-card">
+    <h3>Keyboard</h3>
+    <dl>
+      <dt><kbd>space</kbd></dt><dd>auto-resolve a conflict</dd>
+      <dt><kbd>→</kbd></dt><dd>step one resolution</dd>
+      <dt><kbd>←</kbd></dt><dd>undo the last decision</dd>
+      <dt><kbd>R</kbd></dt><dd>reset the solver</dd>
+      <dt><kbd>M</kbd></dt><dd>toggle clause minimization</dd>
+      <dt><kbd>N</kbd> / <kbd>P</kbd></dt><dd>next / previous figure</dd>
+      <dt><kbd>0</kbd></dt><dd>recenter the circuit</dd>
+      <dt><kbd>?</kbd></dt><dd>toggle this panel</dd>
+    </dl>
+    <h3>Pointer</h3>
+    <dl>
+      <dt>click a node</dt><dd>assign 0 or 1</dd>
+      <dt>hover a node</dt><dd>show reason &amp; level</dd>
+      <dt>hover a trail entry</dt><dd>highlight the node and its reason</dd>
+      <dt>scroll in figure</dt><dd>zoom · drag to pan</dd>
+    </dl>
+    <button class="btn ghost" onclick="document.getElementById('help-overlay').hidden = true">close</button>
+  </div>
+</div>
+
+<script type="module" src="js/app.js?v=3"></script>
+<script src="js/ui.js?v=3"></script>
+<script src="js/tweaks-editorial.js?v=3"></script>
+</body>
+</html>

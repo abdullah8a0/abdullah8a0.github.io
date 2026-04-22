@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AIG · CDCL // terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brutalist.css">
+</head>
+<body>
+
+<div class="frame">
+
+  <!-- top strip ------------------------------------------------------------- -->
+  <header class="top">
+    <div class="sigil">
+      <span class="sigil-mark">▚</span>
+      <span class="sigil-name">AIG—CDCL</span>
+      <span class="sigil-ver">v0.3 · fixpoint.cc</span>
+    </div>
+    <nav class="sections">
+      <a class="sec active" href="#fig">§1 fig</a>
+      <a class="sec" href="#trail">§2 trail</a>
+      <a class="sec" href="#learned">§3 learned</a>
+      <a class="sec" href="#analysis">§4 analysis</a>
+    </nav>
+    <div class="state">
+      <span class="stat-block"><span class="stat-k">DL</span><span class="stat-v" id="dl">0</span></span>
+      <span class="stat-block stat-status"><span class="stat-k">$</span><span class="stat-v" id="status">idle</span></span>
+    </div>
+  </header>
+
+  <!-- control band --------------------------------------------------------- -->
+  <section class="ctl-band">
+    <div class="ctl-group">
+      <span class="ctl-k">[circuit]</span>
+      <select id="circuit-select" class="sel"></select>
+    </div>
+    <div class="ctl-group">
+      <button id="load-aig" class="btn">&gt; load .aig</button>
+      <input type="file" id="aiger-file" accept=".aig" hidden>
+    </div>
+    <div class="ctl-group spacer"></div>
+    <div class="ctl-group">
+      <label class="chk">
+        <input type="checkbox" id="minimize" checked>
+        <span class="chk-box"></span>
+        <span class="chk-lbl">minimize</span>
+      </label>
+    </div>
+    <div class="ctl-group controls">
+      <button id="undo"  class="btn btn-compact" title="Undo (←)">◀ undo</button>
+      <button id="step"  class="btn btn-compact" title="Step (→)">step ▶</button>
+      <button id="auto"  class="btn btn-accent"  title="Auto (Space)">⏵ AUTO</button>
+      <button id="reset" class="btn btn-compact" title="Reset (R)">⟲ reset</button>
+    </div>
+  </section>
+
+  <!-- main ---------------------------------------------------------------- -->
+  <main class="main-grid">
+
+    <!-- figure ============================================================ -->
+    <section class="fig-wrap" id="fig">
+      <div class="panel-head">
+        <span class="panel-num">§1</span>
+        <span class="panel-title">FIGURE</span>
+        <span class="panel-sub">/ And-inverter graph / live assignment</span>
+        <span class="panel-id">01 · fig</span>
+      </div>
+
+      <div class="canvas-wrap" id="canvas-wrap">
+        <div id="canvas"></div>
+        <div class="minimap" id="minimap">
+          <div class="mm-head">MINIMAP</div>
+          <svg id="minimap-svg" viewBox="0 0 1060 680" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="minimap-viewport" id="minimap-vp"></div>
+        </div>
+        <div class="crosshair tl"></div>
+        <div class="crosshair tr"></div>
+        <div class="crosshair bl"></div>
+        <div class="crosshair br"></div>
+      </div>
+
+      <div class="kbd-strip">
+        <button class="kbd-help" onclick="document.getElementById('help-overlay').hidden = false">? keyboard shortcuts</button>
+      </div>
+    </section>
+
+    <!-- side rail ========================================================= -->
+    <aside class="rail">
+      <section class="rail-panel" id="trail-panel">
+        <div class="panel-head">
+          <span class="panel-num">§2</span>
+          <span class="panel-title">TRAIL</span>
+          <span class="panel-id" id="trail-count">—</span>
+        </div>
+        <div class="panel-body" id="trail"></div>
+      </section>
+
+      <section class="rail-panel" id="learned-panel">
+        <div class="panel-head">
+          <span class="panel-num">§3</span>
+          <span class="panel-title">LEARNED</span>
+          <span class="panel-id" id="learned-count">—</span>
+        </div>
+        <div class="panel-body" id="learned"></div>
+      </section>
+
+      <section class="rail-panel" id="analysis-panel">
+        <div class="panel-head">
+          <span class="panel-num">§4</span>
+          <span class="panel-title">ANALYSIS</span>
+          <span class="panel-id" id="analysis-meta">—</span>
+        </div>
+        <div class="panel-body" id="analysis"></div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- bottom strip ======================================================== -->
+  <footer class="bot">
+    <span class="bot-l">&gt;&gt; fixpoint.cc / aig · cdcl / abdullah</span>
+    <nav class="bot-m variants-nav" aria-label="theme variants">
+      <span class="v-k">theme:</span>
+      <a class="v-link" href="./">default</a>
+      <a class="v-link active" href="brutalist.html">brutalist</a>
+      <a class="v-link" href="editorial.html">editorial</a>
+    </nav>
+    <span class="bot-r">[click a node to decide] [hover for detail]</span>
+  </footer>
+</div>
+
+<!-- help overlay -------------------------------------------------------- -->
+<div id="help-overlay" class="help-overlay" hidden>
+  <div class="help-card">
+    <div class="help-head">HELP / KEYBOARD</div>
+    <div class="help-cols">
+      <div>
+        <div class="help-h">PLAYBACK</div>
+        <div class="help-row"><kbd>space</kbd><span>auto-resolve conflict</span></div>
+        <div class="help-row"><kbd>→</kbd><span>step one resolution</span></div>
+        <div class="help-row"><kbd>←</kbd><span>undo last decision</span></div>
+        <div class="help-row"><kbd>R</kbd><span>reset solver</span></div>
+        <div class="help-row"><kbd>M</kbd><span>toggle minimization</span></div>
+      </div>
+      <div>
+        <div class="help-h">NAVIGATE</div>
+        <div class="help-row"><kbd>N</kbd> / <kbd>P</kbd><span>next / prev circuit</span></div>
+        <div class="help-row"><kbd>0</kbd><span>recenter figure</span></div>
+        <div class="help-row"><kbd>?</kbd><span>this panel</span></div>
+        <div class="help-row"><kbd>esc</kbd><span>close overlays</span></div>
+        <div class="help-h" style="margin-top:14px">POINTER</div>
+        <div class="help-row"><span class="mono">click</span><span>assign 0 / 1</span></div>
+        <div class="help-row"><span class="mono">hover</span><span>inspect reason</span></div>
+        <div class="help-row"><span class="mono">scroll</span><span>zoom · drag pan</span></div>
+      </div>
+    </div>
+    <button class="btn" onclick="document.getElementById('help-overlay').hidden = true">[x] close</button>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/tweaks-brutalist.js"></script>
+</body>
+</html>

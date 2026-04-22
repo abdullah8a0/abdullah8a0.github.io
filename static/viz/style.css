@@ -27,6 +27,20 @@ header h1 {
   color: #9cc;
 }
 
+header .variants {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+header .variant-link {
+  color: #888;
+  text-decoration: none;
+  border-bottom: 1px dotted transparent;
+}
+header .variant-link:hover { color: #ddd; border-bottom-color: #555; }
+header .variant-link.active { color: #9cc; border-bottom-color: #9cc; }
+
 header .meta {
   color: #888;
   font-size: 12px;

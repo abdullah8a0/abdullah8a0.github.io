@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Terminal variants — fixpoint.cc</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link rel="icon" href="/lambda.png"/>
+<style>
+  html,body{margin:0;padding:0;min-height:100%;background:#f0eee9;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;}
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="themes/theme-phosphor.jsx"></script>
+<script type="text/babel" src="themes/theme-proof.jsx"></script>
+<script type="text/babel" src="themes/theme-cowsay.jsx"></script>
+<script type="text/babel" src="themes/theme-waveform.jsx"></script>
+<script type="text/babel" src="themes/theme-manpage.jsx"></script>
+<script type="text/babel" src="themes/theme-tmux.jsx"></script>
+<script type="text/babel">
+  const W = 1100, H = 700;
+  function App(){
+    return (
+      <DesignCanvas>
+        <DCSection
+          id="variants"
+          title="Terminal Variants"
+          subtitle="Six visual remixes of the fixpoint.cc terminal. Content is the same; the metaphor stays; the texture, typography, and layout do the arguing.">
+          <DCArtboard id="phosphor" label="01 · Phosphor CRT"     width={W} height={H}><PhosphorCRT/></DCArtboard>
+          <DCArtboard id="proof"    label="02 · Proof Assistant"  width={W} height={H}><ProofAssistant/></DCArtboard>
+          <DCArtboard id="cowsay"   label="03 · Cowsay / Lolcat"  width={W} height={H}><CowsayANSI/></DCArtboard>
+          <DCArtboard id="waveform" label="04 · Waveform / VCD"   width={W} height={H}><Waveform/></DCArtboard>
+          <DCArtboard id="manpage"  label="05 · Man Page"         width={W} height={H}><ManPage/></DCArtboard>
+          <DCArtboard id="tmux"     label="06 · tmux Split"       width={W} height={H}><TmuxSplit/></DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
