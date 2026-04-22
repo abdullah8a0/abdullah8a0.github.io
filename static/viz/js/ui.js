@@ -39,10 +39,36 @@
   let panX = 0, panY = 0, zoom = 1;
   let isPanning = false, panStartX = 0, panStartY = 0, panOrigX = 0, panOrigY = 0;
 
+  // Apply pan/zoom as an SVG transform on an inner <g> wrapper so the SVG
+  // stays crisp at any zoom (CSS transform on the host div rasterizes).
+  // State (panX, panY) remains in screen pixels; we convert to SVG units using
+  // the preserveAspectRatio="meet" fit scale.
   function applyTransform() {
     const inner = $("canvas");
     if (!inner) return;
-    inner.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+    // Clear any legacy CSS transform so the SVG renders at its natural size.
+    inner.style.transform = "";
+    const svg = inner.querySelector(":scope > svg");
+    if (!svg) { syncMinimap(); return; }
+
+    let g = svg.querySelector(":scope > g.pan-zoom");
+    if (!g) {
+      g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.setAttribute("class", "pan-zoom");
+      while (svg.firstChild) g.appendChild(svg.firstChild);
+      svg.appendChild(g);
+    }
+
+    const vb = svg.viewBox.baseVal;
+    const wrap = $("canvas-wrap");
+    const W = wrap ? wrap.clientWidth  : 0;
+    const H = wrap ? wrap.clientHeight : 0;
+    const svgScale = (vb.width && vb.height && W && H)
+      ? Math.min(W / vb.width, H / vb.height)
+      : 1;
+    const tx = panX / svgScale;
+    const ty = panY / svgScale;
+    g.setAttribute("transform", `translate(${tx} ${ty}) scale(${zoom})`);
     syncMinimap();
   }
 
@@ -71,8 +97,8 @@
     }, { passive: false });
 
     wrap.addEventListener("pointerdown", e => {
-      // don't hijack clicks on nodes / learned clauses / popup
-      if (e.target.closest(".node,.lc-box,.lc-label,.popup")) return;
+      // don't hijack clicks on nodes / learned clauses / popup / overlays-in-canvas
+      if (e.target.closest(".node,.lc-box,.lc-label,.popup,.legend,.minimap,.kbd-strip,button,a")) return;
       isPanning = true;
       panStartX = e.clientX; panStartY = e.clientY;
       panOrigX  = panX;      panOrigY  = panY;
@@ -152,7 +178,8 @@
       const svg = canvas.querySelector("svg");
       if (svg && !svg.dataset.stamp) {
         svg.dataset.stamp = String(Date.now());
-        syncMinimap();
+        // Re-wrap the new SVG's children and re-apply current pan/zoom state.
+        applyTransform();
       }
     });
     obs.observe(canvas, { childList: true, subtree: true });
@@ -405,6 +432,21 @@
     });
   }
 
+  // Show help overlay once on a visitor's first arrival, then remember dismissal.
+  function initFirstVisitHelp() {
+    const h = $("help-overlay");
+    if (!h) return;
+    const KEY = "viz-help-seen";
+    let seen = false;
+    try { seen = !!localStorage.getItem(KEY); } catch {}
+    if (!seen) h.hidden = false;
+    new MutationObserver(() => {
+      if (h.hidden) {
+        try { localStorage.setItem(KEY, "1"); } catch {}
+      }
+    }).observe(h, { attributes: true, attributeFilter: ["hidden"] });
+  }
+
   // -------------------------------------------------------------------------
   // Decide-popup augmentation: append a close ✕ whenever the popup appears.
   // render.js creates <div class="popup" id="popup">…</div> on node click.
@@ -467,6 +509,7 @@
     initKeyboard();
     initCounters();
     initHelpDismiss();
+    initFirstVisitHelp();
     initPopupObserver();
     initLegendDismiss();
     // give app.js a moment to finish booting, then resync minimap

@@ -148,7 +148,7 @@
   commands.help = function() {
     return [
       "<p>commands: whoami, ls, cd, cat, open, pwd, date, echo, clear,</p>",
-      "<p>          theme, neofetch, tree, history, grep, man</p>",
+      "<p>          theme, neofetch, tree, history, grep, man, viz</p>",
       "<p>tip: " + tag("strong", "tab") + " to autocomplete, " + tag("strong", "\u2191\u2193") + " for history, " + tag("strong", "man &lt;cmd&gt;") + " for details</p>"
     ].join("");
   };
@@ -381,7 +381,8 @@
     tree:    { synopsis: "tree [path]", desc: "Display the filesystem as an indented tree." },
     history: { synopsis: "history", desc: "Show previously entered commands." },
     grep:    { synopsis: "grep <pattern>", desc: "Search all files in the filesystem for a text pattern." },
-    man:     { synopsis: "man <command>", desc: "Show the manual page for a command." }
+    man:     { synopsis: "man <command>", desc: "Show the manual page for a command." },
+    viz:     { synopsis: "viz", desc: "Launch the AIG CDCL visualizer — interactive non-clausal SAT solving on And-Inverter Graphs." }
   };
 
   commands.man = function(raw, parts) {
@@ -393,6 +394,11 @@
       tag("neofetch-label", "SYNOPSIS") + "\n    " + escapeHtml(page.synopsis) + "\n\n" +
       tag("neofetch-label", "DESCRIPTION") + "\n    " + escapeHtml(page.desc) +
       "</div>";
+  };
+
+  commands.viz = function() {
+    window.location.href = "/viz/";
+    return "<p>launching visualizer...</p>";
   };
 
   /* ── Easter eggs ── */

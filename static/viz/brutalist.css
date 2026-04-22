@@ -608,6 +608,7 @@ html, body {
   align-items: center;
   justify-content: center;
 }
+.help-overlay[hidden] { display: none; }
 .help-card {
   background: var(--paper);
   border: 3px solid var(--ink);

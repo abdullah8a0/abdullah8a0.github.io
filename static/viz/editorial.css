@@ -602,6 +602,7 @@ body > * { position: relative; z-index: 1; }
   justify-content: center;
   backdrop-filter: blur(6px);
 }
+.help-overlay[hidden] { display: none; }
 .help-card {
   background: var(--paper);
   border: 1px solid var(--rule);

@@ -46,12 +46,34 @@ function portIn(gate, slot) {
 
 // Smooth S-curve between two horizontally-separated points, with horizontal
 // tangents at both ends — looks like a real schematic wire.
-function bezierPath(p0, p1) {
+function bezierCtrl(p0, p1) {
   const dx = Math.max(24, Math.abs(p1.x - p0.x));
-  const cx0 = p0.x + dx * 0.5;
-  const cx1 = p1.x - dx * 0.5;
-  return `M ${p0.x} ${p0.y} C ${cx0} ${p0.y}, ${cx1} ${p1.y}, ${p1.x} ${p1.y}`;
+  return [{ x: p0.x + dx * 0.5, y: p0.y }, { x: p1.x - dx * 0.5, y: p1.y }];
 }
+
+function bezierPath(p0, p1) {
+  const [c0, c1] = bezierCtrl(p0, p1);
+  return `M ${p0.x} ${p0.y} C ${c0.x} ${c0.y}, ${c1.x} ${c1.y}, ${p1.x} ${p1.y}`;
+}
+
+// De Casteljau split at t=0.5 — returns the two path strings and the midpoint.
+function bezierHalves(p0, p1) {
+  const [c0, c1] = bezierCtrl(p0, p1);
+  const mid   = midpt(c0, c1);
+  const m01   = midpt(p0, c0);
+  const m12   = mid;
+  const m23   = midpt(c1, p1);
+  const m012  = midpt(m01, m12);
+  const m123  = midpt(m12, m23);
+  const split = midpt(m012, m123);
+  return {
+    mid: split,
+    first:  `M ${p0.x} ${p0.y} C ${m01.x} ${m01.y}, ${m012.x} ${m012.y}, ${split.x} ${split.y}`,
+    second: `M ${split.x} ${split.y} C ${m123.x} ${m123.y}, ${m23.x} ${m23.y}, ${p1.x} ${p1.y}`,
+  };
+}
+
+function midpt(a, b) { return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; }
 
 // D-shape for an AND gate: flat on the left, semicircular bulge on the right.
 function gatePath(g) {
@@ -126,18 +148,26 @@ function drawJunction(svg, id) {
 }
 
 function drawEdge(svg, child, gate, slot) {
-  const p0   = branchPoint(child.ref);
-  const p1   = portIn(gate, slot);
-  const path = mkSvgEl("path", { d: bezierPath(p0, p1), class: "edge" });
-  path.dataset.childRef = child.ref;
-  path.dataset.childInv = child.inv;
-  svg.appendChild(path);
+  const p0 = branchPoint(child.ref);
+  const p1 = portIn(gate, slot);
   if (child.inv) {
+    const { first, second, mid } = bezierHalves(p0, p1);
+    const a = mkSvgEl("path", { d: first,  class: "edge" });
+    const b = mkSvgEl("path", { d: second, class: "edge" });
+    a.dataset.childRef = child.ref;
+    b.dataset.childRef = child.ref;
+    b.dataset.postInv  = "1";
+    svg.appendChild(a);
+    svg.appendChild(b);
     const bub = mkSvgEl("circle", {
-      cx: p1.x - BUBBLE_R, cy: p1.y, r: BUBBLE_R, class: "inv-bubble",
+      cx: mid.x, cy: mid.y, r: BUBBLE_R, class: "inv-bubble",
     });
     bub.dataset.childRef = child.ref;
     svg.appendChild(bub);
+  } else {
+    const path = mkSvgEl("path", { d: bezierPath(p0, p1), class: "edge" });
+    path.dataset.childRef = child.ref;
+    svg.appendChild(path);
   }
 }
 
@@ -145,16 +175,25 @@ function drawOutputEdge(svg, o) {
   const p0 = branchPoint(o.ref);
   const arrowTip = { x: o.x - 4, y: o.y };
   const lineEnd  = { x: o.x - 14, y: o.y };
-  const path = mkSvgEl("path", { d: bezierPath(p0, lineEnd), class: "edge" });
-  path.dataset.outputId = o.id;
-  svg.appendChild(path);
 
   if (o.inv) {
+    const { first, second, mid } = bezierHalves(p0, lineEnd);
+    const a = mkSvgEl("path", { d: first,  class: "edge" });
+    const b = mkSvgEl("path", { d: second, class: "edge" });
+    a.dataset.outputId = o.id;
+    b.dataset.outputId = o.id;
+    b.dataset.postInv  = "1";
+    svg.appendChild(a);
+    svg.appendChild(b);
     const bub = mkSvgEl("circle", {
-      cx: lineEnd.x - BUBBLE_R, cy: o.y, r: BUBBLE_R, class: "inv-bubble",
+      cx: mid.x, cy: mid.y, r: BUBBLE_R, class: "inv-bubble",
     });
     bub.dataset.outputId = o.id;
     svg.appendChild(bub);
+  } else {
+    const path = mkSvgEl("path", { d: bezierPath(p0, lineEnd), class: "edge" });
+    path.dataset.outputId = o.id;
+    svg.appendChild(path);
   }
 
   const arrow = mkSvgEl("path", {
@@ -226,16 +265,18 @@ function updateVisuals() {
     if (S.conflict && S.conflict.id === id) el.classList.add("conflict");
   });
 
-  // Wires carry the *source's raw signal* — the inverter bubble is what
-  // flips it for the consumer. So edges are always coloured by the source
-  // value, never by the post-inversion effective value.
+  // Wires carry the source's raw signal up to the inverter bubble; the half
+  // after the bubble carries the inverted signal. Edges tagged data-post-inv
+  // are colored by applyInv(rawValue, true).
   svg.querySelectorAll(".edge").forEach(el => {
     el.classList.remove("active-true", "active-false");
     let ref;
     if (el.dataset.childRef)       ref = el.dataset.childRef;
     else if (el.dataset.outputId)  ref = S.circuit.outputs.find(o => o.id === el.dataset.outputId).ref;
     else return;
-    const v = S.state[ref]?.value;
+    const raw = S.state[ref]?.value;
+    if (raw === UNKNOWN || raw == null) return;
+    const v = el.dataset.postInv === "1" ? S.applyInv(raw, true) : raw;
     if (v === TRUE)  el.classList.add("active-true");
     if (v === FALSE) el.classList.add("active-false");
   });
