@@ -148,7 +148,7 @@
   commands.help = function() {
     return [
       "<p>commands: whoami, ls, cd, cat, open, pwd, date, echo, clear,</p>",
-      "<p>          theme, neofetch, tree, history, grep, man, viz</p>",
+      "<p>          theme, neofetch, tree, history, grep, man, viz, motd</p>",
       "<p>tip: " + tag("strong", "tab") + " to autocomplete, " + tag("strong", "\u2191\u2193") + " for history, " + tag("strong", "man &lt;cmd&gt;") + " for details</p>"
     ].join("");
   };
@@ -382,7 +382,9 @@
     history: { synopsis: "history", desc: "Show previously entered commands." },
     grep:    { synopsis: "grep <pattern>", desc: "Search all files in the filesystem for a text pattern." },
     man:     { synopsis: "man <command>", desc: "Show the manual page for a command." },
-    viz:     { synopsis: "viz", desc: "Launch the AIG CDCL visualizer — interactive non-clausal SAT solving on And-Inverter Graphs." }
+    viz:     { synopsis: "viz", desc: "Launch the AIG CDCL visualizer — interactive non-clausal SAT solving on And-Inverter Graphs." },
+    motd:    { synopsis: "motd", desc: "Print the message of the day." },
+    qotd:    { synopsis: "qotd", desc: "Alias for motd." }
   };
 
   commands.man = function(raw, parts) {
@@ -400,6 +402,16 @@
     window.location.href = "/viz/brutalist.html";
     return "<p>launching visualizer...</p>";
   };
+
+  /* ── motd / qotd ── */
+
+  commands.motd = function() {
+    var quote = "In every discourse, whether of the mind conversing with its own thoughts, or of the individual in his folley with others, there is an assumed or expressed limit within which the subjects of its operation are confined. The most unfettered discourse is that in which the words we use are understood in the widest possible application, and for them the limits of discourse are co-extensive with those of the universe itself. But more usually we confine ourselves to a less spacious field. Sometimes, in discoursing of men we imply (without expressing the limitation) that it is of men only under certain circumstances and conditions that we speak, as of civilized men, or of men in the vigour of life, or of men under some other condition or relation. Now, whatever may be the extent of the field within which all the objects of our discourse are found, that field may properly be termed the universe of discourse. Furthermore, this universe of discourse is in the strictest sense the ultimate subject of the discourse.";
+    var attribution = "— George Boole, The Laws of Thought. 1854/2003. page 42";
+    return "<p>" + escapeHtml(quote) + "</p>" +
+      "<p>" + tag("neofetch-label", escapeHtml(attribution)) + "</p>";
+  };
+  commands.qotd = commands.motd;
 
   /* ── Easter eggs ── */
 
